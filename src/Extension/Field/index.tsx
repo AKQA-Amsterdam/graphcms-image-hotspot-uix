@@ -20,8 +20,6 @@ const Field: React.FC<{}> = () => {
         setImage("");
         onChange([]);
       }
-
-      return;
     },
     [onChange, image]
   );
