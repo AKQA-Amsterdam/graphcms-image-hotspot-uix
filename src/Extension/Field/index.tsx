@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 
-import { useFieldExtension } from "@graphcms/uix-react-sdk";
+import { useFieldExtension, ToastVariantColor } from "@graphcms/uix-react-sdk";
+import { HotspotDialogProps } from "../Dialog/types";
 
 import "./style.css";
 
-const Field = () => {
-  const { form, value, onChange, openDialog, extension, showToast } =
-    useFieldExtension();
+const Field: React.FC<{}> = () => {
+  const uiExtensionProps = useFieldExtension();
+  const { form, value, onChange, extension } = uiExtensionProps;
   const [image, setImage] = useState("");
   const jsonValue = useMemo(() => JSON.stringify(value, null, 2), [value]);
 
@@ -19,30 +20,39 @@ const Field = () => {
         setImage("");
         onChange([]);
       }
+
+      return;
     },
     [onChange, image]
   );
 
   const subscribeToImageChanges = useCallback(async () => {
     const { IMAGE_FIELD_ID } = extension.fieldConfig;
-    form.subscribeToFieldState(IMAGE_FIELD_ID, handleImageUpdate);
+    form.subscribeToFieldState(IMAGE_FIELD_ID as string, handleImageUpdate, {
+      value: true,
+    });
   }, [form, extension, handleImageUpdate]);
 
   const handleOpenDialog = useCallback(async () => {
+    const { extension, openDialog, showToast, onChange } = uiExtensionProps;
     try {
       const { HOTSPOT_LIMIT } = extension.fieldConfig;
       const v = await openDialog("/selector", {
         disableOverlayClick: true,
         maxWidth: "80vw",
         imgUrl: image,
-        value,
         hotspotLimit: HOTSPOT_LIMIT,
-      });
+        ...uiExtensionProps,
+      } as HotspotDialogProps);
       onChange(v);
     } catch {
-      showToast({ title: "Error saving hotspots to field" });
+      const toastOptions = {
+        variantColor: ToastVariantColor.error,
+        title: "Error saving hotspots to field",
+      };
+      showToast(toastOptions);
     }
-  }, [openDialog, image, value, extension, showToast, onChange]);
+  }, [image, uiExtensionProps]);
 
   useEffect(() => {
     subscribeToImageChanges();

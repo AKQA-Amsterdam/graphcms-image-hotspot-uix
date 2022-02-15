@@ -1,9 +1,10 @@
 import {
   FieldExtensionType,
   FieldExtensionFeature,
+  FieldExtensionDeclaration,
 } from "@graphcms/uix-react-sdk";
 
-const declaration = {
+const declaration: FieldExtensionDeclaration = {
   extensionType: "field",
   fieldType: FieldExtensionType.JSON,
   features: [FieldExtensionFeature.FieldRenderer],

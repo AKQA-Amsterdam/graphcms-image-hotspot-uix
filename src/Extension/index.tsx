@@ -7,7 +7,7 @@ import Dialog from "./Dialog";
 
 import { Wrapper } from "@graphcms/uix-react-sdk";
 
-const Extension = () => {
+const Extension: React.FC<{}> = () => {
   return (
     <Wrapper declaration={declaration}>
       <BrowserRouter>

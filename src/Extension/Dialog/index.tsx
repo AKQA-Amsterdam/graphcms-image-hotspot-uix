@@ -1,14 +1,23 @@
-import { useState, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 
 import {
   useFieldExtension,
   useUiExtensionDialog,
+  ToastVariantColor,
 } from "@graphcms/uix-react-sdk";
 
 import "./style.css";
 
-const Dialog = () => {
-  const { value, imgUrl, hotspotLimit, showToast } = useFieldExtension();
+import { HotspotDialogProps } from "./types";
+
+type Coordinate = {
+  x: number;
+  y: number;
+};
+
+const Dialog: React.FC<{}> = () => {
+  const { value, imgUrl, hotspotLimit, showToast } =
+    useFieldExtension() as HotspotDialogProps;
   const { onCloseDialog } = useUiExtensionDialog();
   const [localValue, setLocalValue] = useState(value || []);
 
@@ -32,9 +41,11 @@ const Dialog = () => {
           },
         ]);
       } else {
-        showToast({
+        const toastOptions = {
+          variantColor: ToastVariantColor.error,
           title: "You have reached the number of Hotspots for this image",
-        });
+        };
+        showToast(toastOptions);
       }
     },
 
@@ -43,7 +54,7 @@ const Dialog = () => {
 
   const handleDotClick = useCallback(
     (idx) => {
-      setLocalValue(localValue.filter((_, i) => i !== idx));
+      setLocalValue(localValue.filter((_: Coordinate, i: number) => i !== idx));
     },
     [localValue]
   );
@@ -57,7 +68,7 @@ const Dialog = () => {
       <div className="image-container">
         <div className="image-wrapper">
           <img src={imgUrl} alt="Add Hotspots" onClick={handleImageClick} />
-          {localValue.map((c, idx) => (
+          {localValue.map((c: Coordinate, idx: number) => (
             <button
               key={`${c.x}-${c.y}-${idx}`}
               className="dot"
